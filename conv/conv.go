@@ -188,3 +188,100 @@ func FromJSON[T any](jsonStr string) (T, error) {
 
 	return result, nil
 }
+
+// ToBool converts any value to a boolean with comprehensive type support.
+// Supports bool, numeric types (0 = false, non-zero = true), and string representations.
+//
+// Example:
+//
+//	b, err := conv.ToBool("true")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println(b) // Output: true
+//
+//	b2 := conv.ToBool(1) // true
+//	b3 := conv.ToBool(0) // false
+func ToBool(v any) (bool, error) {
+	if v == nil {
+		return false, fmt.Errorf("cannot convert nil to bool")
+	}
+
+	switch val := v.(type) {
+	case bool:
+		return val, nil
+	case int, int8, int16, int32, int64:
+		return reflect.ValueOf(val).Int() != 0, nil
+	case uint, uint8, uint16, uint32, uint64:
+		return reflect.ValueOf(val).Uint() != 0, nil
+	case float32, float64:
+		return reflect.ValueOf(val).Float() != 0, nil
+	case string:
+		trimmed := strings.TrimSpace(strings.ToLower(val))
+		switch trimmed {
+		case "true", "t", "yes", "y", "1", "on":
+			return true, nil
+		case "false", "f", "no", "n", "0", "off", "":
+			return false, nil
+		default:
+			return false, fmt.Errorf("cannot convert string %q to bool", val)
+		}
+	default:
+		return false, fmt.Errorf("cannot convert %T to bool", v)
+	}
+}
+
+// ToFloat64 converts any value to a float64 with comprehensive type support.
+// Supports numeric types, string representations of numbers, and booleans.
+//
+// Example:
+//
+//	f, err := conv.ToFloat64("123.45")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println(f) // Output: 123.45
+func ToFloat64(v any) (float64, error) {
+	if v == nil {
+		return 0, fmt.Errorf("cannot convert nil to float64")
+	}
+
+	switch val := v.(type) {
+	case float64:
+		return val, nil
+	case float32:
+		return float64(val), nil
+	case int:
+		return float64(val), nil
+	case int8:
+		return float64(val), nil
+	case int16:
+		return float64(val), nil
+	case int32:
+		return float64(val), nil
+	case int64:
+		return float64(val), nil
+	case uint:
+		return float64(val), nil
+	case uint8:
+		return float64(val), nil
+	case uint16:
+		return float64(val), nil
+	case uint32:
+		return float64(val), nil
+	case uint64:
+		return float64(val), nil
+	case string:
+		if strings.TrimSpace(val) == "" {
+			return 0, fmt.Errorf("cannot convert empty string to float64")
+		}
+		return strconv.ParseFloat(val, 64)
+	case bool:
+		if val {
+			return 1.0, nil
+		}
+		return 0.0, nil
+	default:
+		return 0, fmt.Errorf("cannot convert %T to float64", v)
+	}
+}

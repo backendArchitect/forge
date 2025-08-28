@@ -209,3 +209,123 @@ func TestFromJSON(t *testing.T) {
 		}
 	})
 }
+
+func TestToBool(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   any
+		want    bool
+		wantErr bool
+	}{
+		// Boolean types
+		{"true bool", true, true, false},
+		{"false bool", false, false, false},
+
+		// Integer types
+		{"int 1", 1, true, false},
+		{"int 0", 0, false, false},
+		{"int -1", -1, true, false},
+		{"int8 1", int8(1), true, false},
+		{"int16 0", int16(0), false, false},
+		{"int32 42", int32(42), true, false},
+		{"int64 0", int64(0), false, false},
+		{"uint 1", uint(1), true, false},
+		{"uint 0", uint(0), false, false},
+
+		// Float types
+		{"float32 1.0", float32(1.0), true, false},
+		{"float32 0.0", float32(0.0), false, false},
+		{"float64 -1.5", -1.5, true, false},
+		{"float64 0.0", 0.0, false, false},
+
+		// String types
+		{"string true", "true", true, false},
+		{"string false", "false", false, false},
+		{"string True", "True", true, false},
+		{"string FALSE", "FALSE", false, false},
+		{"string t", "t", true, false},
+		{"string f", "f", false, false},
+		{"string yes", "yes", true, false},
+		{"string no", "no", false, false},
+		{"string y", "y", true, false},
+		{"string n", "n", false, false},
+		{"string 1", "1", true, false},
+		{"string 0", "0", false, false},
+		{"string on", "on", true, false},
+		{"string off", "off", false, false},
+		{"string empty", "", false, false},
+		{"string whitespace", "   ", false, false},
+		{"invalid string", "maybe", false, true},
+
+		// Error cases
+		{"nil", nil, false, true},
+		{"unsupported type", []int{1, 2, 3}, false, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ToBool(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ToBool() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ToBool() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestToFloat64(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   any
+		want    float64
+		wantErr bool
+	}{
+		// Float types
+		{"float64", 42.5, 42.5, false},
+		{"float32", float32(42.5), 42.5, false},
+
+		// Integer types
+		{"int", 42, 42.0, false},
+		{"int8", int8(42), 42.0, false},
+		{"int16", int16(42), 42.0, false},
+		{"int32", int32(42), 42.0, false},
+		{"int64", int64(42), 42.0, false},
+		{"uint", uint(42), 42.0, false},
+		{"uint8", uint8(42), 42.0, false},
+		{"uint16", uint16(42), 42.0, false},
+		{"uint32", uint32(42), 42.0, false},
+		{"uint64", uint64(42), 42.0, false},
+
+		// String types
+		{"valid string", "123.45", 123.45, false},
+		{"integer string", "42", 42.0, false},
+		{"negative string", "-123.45", -123.45, false},
+		{"invalid string", "abc", 0.0, true},
+		{"empty string", "", 0.0, true},
+		{"whitespace string", "   ", 0.0, true},
+
+		// Boolean types
+		{"true bool", true, 1.0, false},
+		{"false bool", false, 0.0, false},
+
+		// Error cases
+		{"nil", nil, 0.0, true},
+		{"unsupported type", []int{1, 2, 3}, 0.0, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ToFloat64(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ToFloat64() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ToFloat64() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

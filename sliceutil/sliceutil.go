@@ -183,3 +183,63 @@ func Difference[T comparable](s1, s2 []T) []T {
 
 	return result
 }
+
+// Intersection returns elements that are present in both slices.
+//
+// Example:
+//
+//	s1 := []int{1, 2, 3, 4}
+//	s2 := []int{2, 4, 6}
+//	common := sliceutil.Intersection(s1, s2)
+//	fmt.Println(common) // Output: [2 4]
+func Intersection[T comparable](s1, s2 []T) []T {
+	if len(s1) == 0 || len(s2) == 0 {
+		return []T{}
+	}
+
+	// Use the smaller slice to build the lookup map for efficiency
+	var lookup map[T]struct{}
+	var searchIn []T
+
+	if len(s1) <= len(s2) {
+		lookup = make(map[T]struct{})
+		for _, item := range s1 {
+			lookup[item] = struct{}{}
+		}
+		searchIn = s2
+	} else {
+		lookup = make(map[T]struct{})
+		for _, item := range s2 {
+			lookup[item] = struct{}{}
+		}
+		searchIn = s1
+	}
+
+	seen := make(map[T]struct{})
+	result := make([]T, 0, len(lookup))
+
+	for _, item := range searchIn {
+		if _, exists := lookup[item]; exists {
+			if _, alreadySeen := seen[item]; !alreadySeen {
+				seen[item] = struct{}{}
+				result = append(result, item)
+			}
+		}
+	}
+
+	return result
+}
+
+// Reverse reverses the elements in a slice in place and returns it for convenience.
+//
+// Example:
+//
+//	slice := []int{1, 2, 3, 4, 5}
+//	reversed := sliceutil.Reverse(slice)
+//	fmt.Println(reversed) // Output: [5 4 3 2 1]
+func Reverse[T any](slice []T) []T {
+	for i, j := 0, len(slice)-1; i < j; i, j = i+1, j-1 {
+		slice[i], slice[j] = slice[j], slice[i]
+	}
+	return slice
+}

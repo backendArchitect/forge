@@ -195,3 +195,60 @@ func Template(template string, data map[string]any) (string, error) {
 
 	return result, nil
 }
+
+// Pad pads a string to the specified length with the given character.
+// If the string is already longer than the target length, it is returned unchanged.
+//
+// Example:
+//
+//	padded := strutil.Pad("hello", 10, ' ')
+//	fmt.Println(padded) // Output: "hello     "
+//
+//	centered := strutil.Pad("hi", 6, '*')
+//	fmt.Println(centered) // Output: "hi****"
+func Pad(s string, length int, padChar rune) string {
+	if len(s) >= length {
+		return s
+	}
+
+	padding := strings.Repeat(string(padChar), length-len(s))
+	return s + padding
+}
+
+// Capitalize capitalizes the first letter of a string and makes the rest lowercase.
+//
+// Example:
+//
+//	cap := strutil.Capitalize("hello WORLD")
+//	fmt.Println(cap) // Output: "Hello world"
+func Capitalize(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	runes := []rune(s)
+	if len(runes) == 1 {
+		return strings.ToUpper(string(runes[0]))
+	}
+
+	return strings.ToUpper(string(runes[0])) + strings.ToLower(string(runes[1:]))
+}
+
+// Reverse reverses the characters in a string.
+//
+// Example:
+//
+//	reversed := strutil.Reverse("hello")
+//	fmt.Println(reversed) // Output: "olleh"
+func Reverse(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+
+	return string(runes)
+}

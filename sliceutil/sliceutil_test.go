@@ -245,3 +245,100 @@ func TestDifference(t *testing.T) {
 		})
 	}
 }
+
+func TestIntersection(t *testing.T) {
+	tests := []struct {
+		name string
+		s1   []int
+		s2   []int
+		want []int
+	}{
+		{"overlapping slices", []int{1, 2, 3, 4}, []int{2, 4, 6}, []int{2, 4}},
+		{"non-overlapping slices", []int{1, 2, 3}, []int{4, 5, 6}, []int{}},
+		{"empty first slice", []int{}, []int{1, 2, 3}, []int{}},
+		{"empty second slice", []int{1, 2, 3}, []int{}, []int{}},
+		{"both empty", []int{}, []int{}, []int{}},
+		{"identical slices", []int{1, 2, 3}, []int{1, 2, 3}, []int{1, 2, 3}},
+		{"duplicates in input", []int{1, 2, 2, 3}, []int{2, 2, 4}, []int{2}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Intersection(tt.s1, tt.s2)
+			
+			// For intersection, we need to check that all elements in 'got' are in 'want' and vice versa
+			// since order might be different
+			if len(got) != len(tt.want) {
+				t.Errorf("Intersection() length = %d, want %d", len(got), len(tt.want))
+				return
+			}
+			
+			// Create maps to compare contents
+			gotMap := make(map[int]int)
+			wantMap := make(map[int]int)
+			
+			for _, v := range got {
+				gotMap[v]++
+			}
+			for _, v := range tt.want {
+				wantMap[v]++
+			}
+			
+			if !reflect.DeepEqual(gotMap, wantMap) {
+				t.Errorf("Intersection() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReverse(t *testing.T) {
+	t.Run("normal slice", func(t *testing.T) {
+		input := []int{1, 2, 3, 4, 5}
+		want := []int{5, 4, 3, 2, 1}
+		got := Reverse(input)
+		
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Reverse() = %v, want %v", got, want)
+		}
+		
+		// Check that original slice was modified
+		if !reflect.DeepEqual(input, want) {
+			t.Errorf("Reverse() should modify original slice, got %v, want %v", input, want)
+		}
+	})
+
+	t.Run("empty slice", func(t *testing.T) {
+		input := []int{}
+		got := Reverse(input)
+		if len(got) != 0 {
+			t.Errorf("Reverse() of empty slice should remain empty")
+		}
+	})
+
+	t.Run("single element", func(t *testing.T) {
+		input := []int{42}
+		want := []int{42}
+		got := Reverse(input)
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Reverse() = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("two elements", func(t *testing.T) {
+		input := []int{1, 2}
+		want := []int{2, 1}
+		got := Reverse(input)
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Reverse() = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("strings", func(t *testing.T) {
+		input := []string{"a", "b", "c"}
+		want := []string{"c", "b", "a"}
+		got := Reverse(input)
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Reverse() = %v, want %v", got, want)
+		}
+	})
+}

@@ -267,3 +267,146 @@ func TestCopyFile(t *testing.T) {
 		}
 	})
 }
+
+func TestEnsureDir(t *testing.T) {
+	t.Run("create new directory", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		dirPath := filepath.Join(tmpDir, "new", "nested", "directory")
+
+		err := EnsureDir(dirPath)
+		if err != nil {
+			t.Fatalf("EnsureDir() error = %v", err)
+		}
+
+		if !IsDir(dirPath) {
+			t.Error("EnsureDir() did not create directory")
+		}
+	})
+
+	t.Run("directory already exists", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		err := EnsureDir(tmpDir)
+		if err != nil {
+			t.Fatalf("EnsureDir() error on existing directory = %v", err)
+		}
+
+		if !IsDir(tmpDir) {
+			t.Error("EnsureDir() should not affect existing directory")
+		}
+	})
+}
+
+func TestReadFile(t *testing.T) {
+	t.Run("read existing file", func(t *testing.T) {
+		content := "Hello, World!\nThis is a test file."
+		tmpFile, err := os.CreateTemp("", "readtest")
+		if err != nil {
+			t.Fatalf("Failed to create temp file: %v", err)
+		}
+		defer os.Remove(tmpFile.Name())
+
+		_, err = tmpFile.WriteString(content)
+		if err != nil {
+			t.Fatalf("Failed to write to temp file: %v", err)
+		}
+		tmpFile.Close()
+
+		result, err := ReadFile(tmpFile.Name())
+		if err != nil {
+			t.Fatalf("ReadFile() error = %v", err)
+		}
+
+		if result != content {
+			t.Errorf("ReadFile() = %q, want %q", result, content)
+		}
+	})
+
+	t.Run("read non-existent file", func(t *testing.T) {
+		_, err := ReadFile("/path/that/does/not/exist")
+		if err == nil {
+			t.Error("ReadFile() expected error for non-existent file")
+		}
+	})
+}
+
+func TestWriteFile(t *testing.T) {
+	t.Run("write to new file", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		filePath := filepath.Join(tmpDir, "test.txt")
+		content := "Hello, World!\nThis is a test."
+
+		err := WriteFile(filePath, content)
+		if err != nil {
+			t.Fatalf("WriteFile() error = %v", err)
+		}
+
+		if !IsFile(filePath) {
+			t.Error("WriteFile() did not create file")
+		}
+
+		result, err := ReadFile(filePath)
+		if err != nil {
+			t.Fatalf("Failed to read written file: %v", err)
+		}
+
+		if result != content {
+			t.Errorf("Written content = %q, want %q", result, content)
+		}
+	})
+
+	t.Run("write to nested path", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		filePath := filepath.Join(tmpDir, "nested", "dir", "test.txt")
+		content := "Nested file content"
+
+		err := WriteFile(filePath, content)
+		if err != nil {
+			t.Fatalf("WriteFile() error = %v", err)
+		}
+
+		if !IsFile(filePath) {
+			t.Error("WriteFile() did not create nested file")
+		}
+
+		result, err := ReadFile(filePath)
+		if err != nil {
+			t.Fatalf("Failed to read nested file: %v", err)
+		}
+
+		if result != content {
+			t.Errorf("Nested file content = %q, want %q", result, content)
+		}
+	})
+
+	t.Run("overwrite existing file", func(t *testing.T) {
+		tmpFile, err := os.CreateTemp("", "writetest")
+		if err != nil {
+			t.Fatalf("Failed to create temp file: %v", err)
+		}
+		defer os.Remove(tmpFile.Name())
+
+		originalContent := "Original content"
+		newContent := "New content"
+
+		_, err = tmpFile.WriteString(originalContent)
+		if err != nil {
+			t.Fatalf("Failed to write original content: %v", err)
+		}
+		tmpFile.Close()
+
+		err = WriteFile(tmpFile.Name(), newContent)
+		if err != nil {
+			t.Fatalf("WriteFile() error = %v", err)
+		}
+
+		result, err := ReadFile(tmpFile.Name())
+		if err != nil {
+			t.Fatalf("Failed to read overwritten file: %v", err)
+		}
+
+		if result != newContent {
+			t.Errorf("Overwritten content = %q, want %q", result, newContent)
+		}
+	})
+}
