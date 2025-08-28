@@ -4,7 +4,6 @@ package sliceutil
 
 import (
 	"math/rand"
-	"time"
 )
 
 // Unique returns a new slice containing only unique elements from the input slice.
@@ -147,9 +146,6 @@ func Shuffle[T any](slice []T) []T {
 	if len(slice) <= 1 {
 		return slice
 	}
-
-	// Initialize random seed if not already done
-	rand.Seed(time.Now().UnixNano())
 
 	for i := len(slice) - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)

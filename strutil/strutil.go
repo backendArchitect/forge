@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 )
 
@@ -36,9 +35,6 @@ func Random(length int, charset ...string) string {
 	if len(chars) == 0 {
 		return ""
 	}
-
-	// Initialize random seed if not already done
-	rand.Seed(time.Now().UnixNano())
 
 	result := make([]byte, length)
 	for i := range result {
@@ -134,7 +130,8 @@ func SnakeToCamel(s string) string {
 				result.WriteString(parts[i])
 				firstPart = false
 			} else {
-				result.WriteString(strings.Title(parts[i]))
+				// Capitalize first letter and make rest lowercase
+				result.WriteString(strings.ToUpper(string(parts[i][0])) + strings.ToLower(parts[i][1:]))
 			}
 		}
 	}
