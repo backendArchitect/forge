@@ -1,10 +1,10 @@
-# Kit - A Modular Go Utility Library
+# forge - A Modular Go Utility Library
 
 [![CI](https://github.com/backendArchitect/forge/actions/workflows/ci.yml/badge.svg)](https://github.com/backendArchitect/forge/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/backendArchitect/forge.svg)](https://pkg.go.dev/github.com/backendArchitect/forge)
 [![Go Report Card](https://goreportcard.com/badge/github.com/backendArchitect/forge)](https://goreportcard.com/report/github.com/backendArchitect/forge)
 
-Kit is a modular Go utility library that provides common functionality with zero external dependencies. The library follows Go best practices and offers excellent performance, comprehensive documentation, and high test coverage.
+forge is a modular Go utility library that provides common functionality with zero external dependencies. The library follows Go best practices and offers excellent performance, comprehensive documentation, and high test coverage.
 
 ## Features
 
