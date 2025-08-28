@@ -127,7 +127,7 @@ func SnakeToCamel(s string) string {
 
 	var result strings.Builder
 	firstPart := true
-	
+
 	for i := 0; i < len(parts); i++ {
 		if len(parts[i]) > 0 {
 			if firstPart {

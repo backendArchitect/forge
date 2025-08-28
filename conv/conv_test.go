@@ -22,22 +22,22 @@ func TestToInt(t *testing.T) {
 		{"uint16", uint16(42), 42, false},
 		{"uint32", uint32(42), 42, false},
 		{"uint64", uint64(42), 42, false},
-		
+
 		// Float types
 		{"float32", float32(42.5), 42, false},
 		{"float64", 42.9, 42, false},
-		
+
 		// String types
 		{"valid string", "123", 123, false},
 		{"negative string", "-123", -123, false},
 		{"invalid string", "abc", 0, true},
 		{"empty string", "", 0, true},
 		{"whitespace string", "   ", 0, true},
-		
+
 		// Boolean types
 		{"true bool", true, 1, false},
 		{"false bool", false, 0, false},
-		
+
 		// Error cases
 		{"nil", nil, 0, true},
 		{"unsupported type", []int{1, 2, 3}, 0, true},

@@ -176,7 +176,7 @@ func ToJSON(v any) (string, error) {
 //	fmt.Printf("%+v\n", person) // Output: {Name:John Age:30}
 func FromJSON[T any](jsonStr string) (T, error) {
 	var result T
-	
+
 	if strings.TrimSpace(jsonStr) == "" {
 		return result, fmt.Errorf("cannot unmarshal empty JSON string")
 	}

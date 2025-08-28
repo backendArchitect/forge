@@ -12,7 +12,7 @@ func TestParallelMap(t *testing.T) {
 	t.Run("correct output and order", func(t *testing.T) {
 		input := []int{1, 2, 3, 4, 5}
 		expected := []int{2, 4, 6, 8, 10}
-		
+
 		result := ParallelMap(input, func(x int) int {
 			time.Sleep(10 * time.Millisecond) // Simulate work
 			return x * 2
@@ -26,7 +26,7 @@ func TestParallelMap(t *testing.T) {
 	t.Run("empty slice", func(t *testing.T) {
 		input := []int{}
 		result := ParallelMap(input, func(x int) int { return x * 2 })
-		
+
 		if len(result) != 0 {
 			t.Errorf("ParallelMap() with empty slice should return empty slice")
 		}
@@ -35,7 +35,7 @@ func TestParallelMap(t *testing.T) {
 	t.Run("type transformation", func(t *testing.T) {
 		input := []int{1, 2, 3}
 		expected := []string{"1", "2", "3"}
-		
+
 		result := ParallelMap(input, func(x int) string {
 			return fmt.Sprintf("%d", x)
 		})
@@ -49,7 +49,7 @@ func TestParallelMap(t *testing.T) {
 func TestErrGroup(t *testing.T) {
 	t.Run("all succeed", func(t *testing.T) {
 		eg := &ErrGroup{}
-		
+
 		for i := 0; i < 5; i++ {
 			eg.Go(func() error {
 				time.Sleep(10 * time.Millisecond)
@@ -65,7 +65,7 @@ func TestErrGroup(t *testing.T) {
 
 	t.Run("one fails", func(t *testing.T) {
 		eg := &ErrGroup{}
-		
+
 		for i := 0; i < 5; i++ {
 			i := i // capture loop variable
 			eg.Go(func() error {
@@ -86,7 +86,7 @@ func TestErrGroup(t *testing.T) {
 	t.Run("no goroutines", func(t *testing.T) {
 		eg := &ErrGroup{}
 		err := eg.Wait()
-		
+
 		if err != nil {
 			t.Errorf("ErrGroup.Wait() with no goroutines = %v, want nil", err)
 		}

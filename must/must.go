@@ -26,7 +26,7 @@ func Must[T any](value T, err error) T {
 //	file, err := os.Open("config.txt")
 //	must.Must0(err)
 //	defer file.Close()
-//	
+//
 //	must.Must0(json.NewEncoder(file).Encode(data))
 func Must0(err error) {
 	if err != nil {

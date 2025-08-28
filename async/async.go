@@ -57,7 +57,7 @@ func ParallelMap[T, U any](input []T, transform func(T) U) []U {
 //		fmt.Printf("Error: %v\n", err)
 //	}
 type ErrGroup struct {
-	wg     sync.WaitGroup
+	wg      sync.WaitGroup
 	errOnce sync.Once
 	err     error
 }
@@ -175,7 +175,7 @@ func (p *Pool) worker() {
 //	}, 100*time.Millisecond)
 //
 //	debouncedFunc() // Will be cancelled
-//	debouncedFunc() // Will be cancelled  
+//	debouncedFunc() // Will be cancelled
 //	debouncedFunc() // Will execute after 100ms
 func Debounce(f func(), delay time.Duration) func() {
 	var timer *time.Timer
