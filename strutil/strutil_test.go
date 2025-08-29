@@ -257,3 +257,83 @@ func TestTemplate(t *testing.T) {
 		}
 	})
 }
+
+func TestPad(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		length  int
+		padChar rune
+		want    string
+	}{
+		{"pad with spaces", "hello", 10, ' ', "hello     "},
+		{"pad with asterisks", "hi", 6, '*', "hi****"},
+		{"no padding needed", "hello", 5, '-', "hello"},
+		{"no padding for longer string", "hello world", 5, '-', "hello world"},
+		{"pad single char", "a", 3, 'x', "axx"},
+		{"pad empty string", "", 5, 'z', "zzzzz"},
+		{"zero length", "hello", 0, ' ', "hello"},
+		{"negative length", "hello", -1, ' ', "hello"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Pad(tt.input, tt.length, tt.padChar)
+			if got != tt.want {
+				t.Errorf("Pad(%q, %d, %q) = %q, want %q", tt.input, tt.length, tt.padChar, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCapitalize(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"lowercase word", "hello", "Hello"},
+		{"uppercase word", "HELLO", "Hello"},
+		{"mixed case", "hELLo", "Hello"},
+		{"sentence", "hello WORLD", "Hello world"},
+		{"single char lowercase", "a", "A"},
+		{"single char uppercase", "A", "A"},
+		{"empty string", "", ""},
+		{"with numbers", "hello123", "Hello123"},
+		{"with spaces", "hello world", "Hello world"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Capitalize(tt.input)
+			if got != tt.want {
+				t.Errorf("Capitalize(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReverse(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"simple string", "hello", "olleh"},
+		{"single char", "a", "a"},
+		{"empty string", "", ""},
+		{"palindrome", "racecar", "racecar"},
+		{"with spaces", "hello world", "dlrow olleh"},
+		{"with numbers", "abc123", "321cba"},
+		{"unicode", "hello 🌍", "🌍 olleh"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Reverse(tt.input)
+			if got != tt.want {
+				t.Errorf("Reverse(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}

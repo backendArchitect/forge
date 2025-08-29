@@ -232,3 +232,112 @@ func TestThrottle(t *testing.T) {
 		}
 	})
 }
+
+func TestTimeout(t *testing.T) {
+	t.Run("function completes within timeout", func(t *testing.T) {
+		err := Timeout(func() error {
+			time.Sleep(50 * time.Millisecond)
+			return nil
+		}, 100*time.Millisecond)
+
+		if err != nil {
+			t.Errorf("Timeout() should not error for function that completes in time, got: %v", err)
+		}
+	})
+
+	t.Run("function times out", func(t *testing.T) {
+		err := Timeout(func() error {
+			time.Sleep(200 * time.Millisecond)
+			return nil
+		}, 100*time.Millisecond)
+
+		if err == nil {
+			t.Error("Timeout() should error for function that takes too long")
+		}
+	})
+
+	t.Run("function returns error", func(t *testing.T) {
+		expectedErr := fmt.Errorf("test error")
+		err := Timeout(func() error {
+			return expectedErr
+		}, 100*time.Millisecond)
+
+		if err != expectedErr {
+			t.Errorf("Timeout() should return function error, got: %v, want: %v", err, expectedErr)
+		}
+	})
+}
+
+func TestRetry(t *testing.T) {
+	t.Run("succeeds on first attempt", func(t *testing.T) {
+		attempts := 0
+		result, err := Retry(func() (string, error) {
+			attempts++
+			return "success", nil
+		}, 3, 10*time.Millisecond)
+
+		if err != nil {
+			t.Errorf("Retry() should not error on success, got: %v", err)
+		}
+		if result != "success" {
+			t.Errorf("Retry() result = %v, want 'success'", result)
+		}
+		if attempts != 1 {
+			t.Errorf("Retry() attempts = %d, want 1", attempts)
+		}
+	})
+
+	t.Run("succeeds on third attempt", func(t *testing.T) {
+		attempts := 0
+		result, err := Retry(func() (string, error) {
+			attempts++
+			if attempts < 3 {
+				return "", fmt.Errorf("attempt %d failed", attempts)
+			}
+			return "success", nil
+		}, 3, 10*time.Millisecond)
+
+		if err != nil {
+			t.Errorf("Retry() should not error on eventual success, got: %v", err)
+		}
+		if result != "success" {
+			t.Errorf("Retry() result = %v, want 'success'", result)
+		}
+		if attempts != 3 {
+			t.Errorf("Retry() attempts = %d, want 3", attempts)
+		}
+	})
+
+	t.Run("fails after all attempts", func(t *testing.T) {
+		attempts := 0
+		result, err := Retry(func() (string, error) {
+			attempts++
+			return "", fmt.Errorf("attempt %d failed", attempts)
+		}, 3, 10*time.Millisecond)
+
+		if err == nil {
+			t.Error("Retry() should error after all attempts fail")
+		}
+		if result != "" {
+			t.Errorf("Retry() result = %v, want empty string", result)
+		}
+		if attempts != 3 {
+			t.Errorf("Retry() attempts = %d, want 3", attempts)
+		}
+	})
+
+	t.Run("zero attempts defaults to one", func(t *testing.T) {
+		attempts := 0
+		_, err := Retry(func() (string, error) {
+			attempts++
+			return "", fmt.Errorf("failed")
+		}, 0, 10*time.Millisecond)
+
+		if err == nil {
+			t.Error("Retry() should error when function fails")
+		}
+		if attempts != 1 {
+			t.Errorf("Retry() attempts = %d, want 1", attempts)
+		}
+	})
+}

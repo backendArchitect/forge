@@ -152,3 +152,52 @@ func CopyFile(src, dst string) error {
 	// Set permissions to match source
 	return os.Chmod(dst, srcInfo.Mode())
 }
+
+// EnsureDir creates a directory and all necessary parent directories.
+// If the directory already exists, no error is returned.
+//
+// Example:
+//
+//	err := fsutil.EnsureDir("/path/to/nested/directory")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+func EnsureDir(path string) error {
+	return os.MkdirAll(path, 0755)
+}
+
+// ReadFile reads the entire content of a file and returns it as a string.
+//
+// Example:
+//
+//	content, err := fsutil.ReadFile("config.txt")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println(content)
+func ReadFile(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// WriteFile writes string content to a file, creating it if it doesn't exist.
+// If the file already exists, it will be truncated.
+//
+// Example:
+//
+//	err := fsutil.WriteFile("output.txt", "Hello, World!")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+func WriteFile(path, content string) error {
+	// Create directory if it doesn't exist
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, []byte(content), 0644)
+}

@@ -36,6 +36,15 @@ count := conv.Must(conv.ToInt("42")) // Using with must package
 str := conv.ToString(123)
 str = conv.ToString(true)
 
+// Convert to boolean with comprehensive support
+isActive, err := conv.ToBool("true")  // true
+enabled := conv.ToBool(1)             // true
+disabled := conv.ToBool(0)            // false
+
+// Convert to float64 with type safety
+price, err := conv.ToFloat64("123.45")
+ratio := conv.ToFloat64(42)           // 42.0
+
 // JSON operations
 type Person struct {
     Name string `json:"name"`
@@ -81,6 +90,12 @@ shuffled := sliceutil.Shuffle(numbers)
 
 // Find differences
 diff := sliceutil.Difference([]int{1, 2, 3}, []int{2, 4}) // [1, 3]
+
+// Find intersections
+common := sliceutil.Intersection([]int{1, 2, 3}, []int{2, 3, 4}) // [2, 3]
+
+// Reverse elements in place
+reversed := sliceutil.Reverse([]int{1, 2, 3, 4}) // [4, 3, 2, 1]
 ```
 
 ### strutil - String Utilities
@@ -107,6 +122,16 @@ template := "Hello {{name}}, you are {{age}} years old"
 data := map[string]any{"name": "John", "age": 30}
 result, _ := strutil.Template(template, data)
 // "Hello John, you are 30 years old"
+
+// Pad strings to specific length
+padded := strutil.Pad("hello", 10, ' ')    // "hello     "
+centered := strutil.Pad("hi", 6, '*')      // "hi****"
+
+// Capitalize first letter
+title := strutil.Capitalize("hello WORLD") // "Hello world"
+
+// Reverse string characters
+backwards := strutil.Reverse("hello")      // "olleh"
 ```
 
 ### async - Concurrency Utilities
@@ -155,6 +180,17 @@ debouncedSave := async.Debounce(func() {
 throttledUpdate := async.Throttle(func() {
     fmt.Println("Updating...")
 }, 100*time.Millisecond)
+
+// Execute functions with timeout
+err := async.Timeout(func() error {
+    // Some operation that might take too long
+    return doSomething()
+}, 5*time.Second)
+
+// Retry operations with exponential backoff
+result, err := async.Retry(func() (string, error) {
+    return fetchDataFromAPI()
+}, 3, 100*time.Millisecond)
 ```
 
 ### must - Panic on Error
@@ -204,6 +240,13 @@ must.Must0(fsutil.ReadJSON("config.json", &loadedConfig))
 
 // Copy files
 must.Must0(fsutil.CopyFile("source.txt", "destination.txt"))
+
+// Ensure directory exists
+must.Must0(fsutil.EnsureDir("/path/to/nested/directory"))
+
+// Read and write text files
+content, err := fsutil.ReadFile("config.txt")
+must.Must0(fsutil.WriteFile("output.txt", "Hello, World!"))
 ```
 
 ## Contributing

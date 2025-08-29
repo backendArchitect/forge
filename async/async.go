@@ -3,6 +3,7 @@
 package async
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -220,4 +221,71 @@ func Throttle(f func(), interval time.Duration) func() {
 			f()
 		}
 	}
+}
+
+// Timeout wraps a function with a timeout mechanism.
+// Returns an error if the function doesn't complete within the specified duration.
+//
+// Example:
+//
+//	err := async.Timeout(func() error {
+//		time.Sleep(200 * time.Millisecond)
+//		return nil
+//	}, 100*time.Millisecond)
+//	
+//	if err != nil {
+//		fmt.Printf("Function timed out: %v\n", err)
+//	}
+func Timeout(f func() error, timeout time.Duration) error {
+	done := make(chan error, 1)
+	
+	go func() {
+		done <- f()
+	}()
+	
+	select {
+	case err := <-done:
+		return err
+	case <-time.After(timeout):
+		return fmt.Errorf("operation timed out after %v", timeout)
+	}
+}
+
+// Retry executes a function up to maxAttempts times with exponential backoff.
+// Returns the result of the first successful attempt or the last error.
+//
+// Example:
+//
+//	result, err := async.Retry(func() (string, error) {
+//		// Some operation that might fail
+//		return fetchDataFromAPI()
+//	}, 3, 100*time.Millisecond)
+//	
+//	if err != nil {
+//		fmt.Printf("All retry attempts failed: %v\n", err)
+//	}
+func Retry[T any](f func() (T, error), maxAttempts int, initialDelay time.Duration) (T, error) {
+	var result T
+	var lastErr error
+	
+	if maxAttempts <= 0 {
+		maxAttempts = 1
+	}
+	
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		result, lastErr = f()
+		if lastErr == nil {
+			return result, nil
+		}
+		
+		// Don't delay after the last attempt
+		if attempt < maxAttempts {
+			delay := time.Duration(attempt-1) * initialDelay
+			if delay > 0 {
+				time.Sleep(delay)
+			}
+		}
+	}
+	
+	return result, fmt.Errorf("after %d attempts, last error: %w", maxAttempts, lastErr)
 }
